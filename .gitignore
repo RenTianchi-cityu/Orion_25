@@ -1,0 +1,5 @@
+ckpts/
+data*/
+build/
+test/
+mmcv/*.so
