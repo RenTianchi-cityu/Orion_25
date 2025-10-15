@@ -406,7 +406,30 @@ class OrionAgent(autonomous_agent.AutonomousAgent):
                     
         custom_wrap_fp16_model(self.model)
         output_data_batch = self.model(input_data_batch, return_loss=False)
+        
+        # Print inference outputs
+        print("=" * 50)
+        print("ORION INFERENCE OUTPUT:")
+        print("=" * 50)
+        print(f"Step: {self.step}")
+        print(f"Output data batch keys: {list(output_data_batch[0].keys())}")
+        
+        # Print ego future predictions (trajectory)
         out_truck = output_data_batch[0]['pts_bbox']['ego_fut_preds'].cpu().numpy()
+        print(f"Ego future predictions shape: {out_truck.shape}")
+        print(f"Ego future predictions: {out_truck}")
+        
+        # Print other available outputs
+        if 'text_out' in output_data_batch[0]:
+            print(f"Generated text: {output_data_batch[0]['text_out']}")
+        
+        if 'metric_results' in output_data_batch[0]:
+            print(f"Metric results: {output_data_batch[0]['metric_results']}")
+        
+        # Print control commands
+        print(f"Current command: {tick_data['command_curr']}")
+        print(f"Near command: {tick_data['command_near']}")
+        print("=" * 50)
         steer_traj, throttle_traj, brake_traj, metadata_traj = self.pidcontroller.control_pid(out_truck, tick_data['speed'], local_command_xy)
         if brake_traj < 0.05: brake_traj = 0.0
         if throttle_traj > brake_traj: brake_traj = 0.0
@@ -418,6 +441,14 @@ class OrionAgent(autonomous_agent.AutonomousAgent):
         control.steer = np.clip(float(steer_traj), -1, 1)
         control.throttle = np.clip(float(throttle_traj), 0, 0.75)
         control.brake = np.clip(float(brake_traj), 0, 1)
+        
+        # Print final control outputs
+        print("CONTROL OUTPUTS:")
+        print(f"Steer: {control.steer:.4f}")
+        print(f"Throttle: {control.throttle:.4f}")
+        print(f"Brake: {control.brake:.4f}")
+        print(f"Speed: {tick_data['speed']:.2f} m/s")
+        print("=" * 50)
         self.pid_metadata['steer'] = control.steer
         self.pid_metadata['throttle'] = control.throttle
         self.pid_metadata['brake'] = control.brake

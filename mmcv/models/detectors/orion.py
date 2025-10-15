@@ -972,6 +972,19 @@ class Orion(MVXTwoStageDetector):
             # print(result_dict['metric_results']['fut_valid_flag']) for debug
         bbox_list[0]['text_out'] = generated_text
         bbox_list[0]['pts_bbox'].update(lane_results[0])
+        
+        # Print model inference outputs
+        print("MODEL INTERNAL OUTPUTS:")
+        print(f"Bbox results keys: {list(bbox_list[0].keys())}")
+        if 'pts_bbox' in bbox_list[0]:
+            print(f"Pts bbox keys: {list(bbox_list[0]['pts_bbox'].keys())}")
+            if 'ego_fut_preds' in bbox_list[0]['pts_bbox']:
+                ego_preds = bbox_list[0]['pts_bbox']['ego_fut_preds']
+                print(f"Ego future predictions shape: {ego_preds.shape}")
+                print(f"Ego future predictions: {ego_preds}")
+        if generated_text:
+            print(f"Generated text: {generated_text}")
+        print("=" * 30)
        
         return bbox_list
 
