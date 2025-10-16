@@ -1,0 +1,6 @@
+data*/
+assets/gifs/
+assets/images/
+build/
+test/
+mmcv/*.so
